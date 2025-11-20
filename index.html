@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMANDEL Student Hub</title>
+    
+    <!-- Impor Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Impor Font Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Konfigurasi Tailwind -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        'custom-bg': '#1e1f26', // Latar belakang utama (default)
+                        'custom-card': '#272a33', // Warna kartu (default)
+                        'custom-card-light': '#3a3e4a', // Kartu yang sedikit lebih terang
+                        'custom-primary': '#8a7fff', // Aksen ungu/biru
+                        'priority-important': '#fde047', // Kuning (Important)
+                        'priority-normal': '#3b82f6', // Biru (Normal)
+                        'priority-urgent': '#ef4444', // Merah (Urgent)
+                    }
+                },
+            },
+        };
+    </script>
+    
+    <!-- Gaya CSS Kustom (dari v3) -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #1e1f26; 
+            transition: background 0.5s ease;
+        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #272a33; }
+        ::-webkit-scrollbar-thumb { background: #3a3e4a; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #4a4e5a; }
+        
+        .todo-checkbox {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid #5a5e6a;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+        .todo-checkbox:checked {
+            background-color: #8a7fff;
+            border-color: #8a7fff;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z'/%3E%3C/svg%3E");
+            background-size: 14px;
+            background-position: center;
+        }
+
+        .theme-default { background-color: #1e1f26; background-image: none; }
+        .theme-vibrant { background-image: linear-gradient(to right bottom, #6366f1, #a855f7, #ec4899); }
+        .theme-sunrise { background-image: linear-gradient(to right bottom, #f97316, #f59e0b, #fde047); }
+        .theme-ocean { background-image: linear-gradient(to right bottom, #22d3ee, #0e7490, #1e3a8a); }
+        .theme-candy { background-image: linear-gradient(to right bottom, #ec4899, #f472b6, #a78bfa); }
+        .theme-twilight { background-image: linear-gradient(to right bottom, #1e1b4b, #4c1d95, #7c3aed); }
+        .theme-peach { background-image: linear-gradient(to right bottom, #fecdd3, #fb7185, #f43f5e); }
+        .theme-lava { background-image: linear-gradient(to right bottom, #f97316, #dc2626, #7f1d1d); }
+
+        .bg-custom-card {
+            background-color: rgba(39, 42, 51, 0.8) !important;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .bg-custom-card-light {
+            background-color: rgba(58, 62, 74, 0.7) !important;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        nav {
+            background-color: rgba(39, 42, 51, 0.7) !important;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        #page-tugas .dark\\:bg-custom-card {
+            background-color: rgba(39, 42, 51, 0.8) !important;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        #page-tugas .dark\\:bg-custom-card-light {
+            background-color: rgba(58, 62, 74, 0.7) !important;
+        }
+
+        #settings-modal { opacity: 0; transition: opacity 0.3s ease-out; }
+        #settings-modal.flex { display: flex; }
+        #settings-modal.modal-visible { opacity: 1; }
+        #settings-modal-panel { opacity: 0; transform: scale(0.95); transition: all 0.3s ease-out; }
+        #settings-modal.modal-visible #settings-modal-panel { opacity: 1; transform: scale(1); }
+        
+        #timer-display-bg {
+            background-color: #272a33 !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+            border: none !important;
+        }
+        #timer-display-inner-bg {
+            background-color: #1e1f26 !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+            border: none !important;
+        }
+    </style>
+</head>
+<body class="bg-custom-bg text-gray-200 theme-default">
+
+    <!-- Header / Navigasi -->
+    <nav class="bg-custom-card shadow-lg p-4 sticky top-0 z-50 transition-colors duration-300">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold text-white">SMANDEL Student Hub</h1>
+            <div class="flex items-center space-x-4">
+                <button id="nav-dashboard" class="nav-btn bg-custom-primary text-white px-4 py-2 rounded-lg font-semibold transition-all duration-200 hover:scale-105">Dashboard</button>
+                <button id="nav-tugas" class="nav-btn bg-gray-600 text-white px-4 py-2 rounded-lg font-semibold transition-all duration-200 hover:scale-105 hover:bg-gray-500">Kumpul Tugas</button>
+                <button id="btn-settings" class="nav-btn bg-gray-600 text-white p-2 rounded-lg font-semibold transition-all duration-200 hover:scale-105 hover:bg-gray-500" title="Pengaturan Tema">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Konten Utama -->
+    <main class="container mx-auto p-4 md:p-6 lg:p-8">
+    
+        <!-- =================================================================
+             HALAMAN DASHBOARD (FOCUS TIMER & TO-DO LIST)
+             ================================================================== -->
+        <div id="page-dashboard">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+                <!-- Kolom Kiri: Focus Stats (dari v3) -->
+                <div class="lg:col-span-3 space-y-6">
+                    <h2 class="text-2xl font-bold text-white mb-4">Focus Stats</h2>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-custom-card p-4 rounded-xl shadow-lg transition-colors duration-300">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-custom-primary"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
+                                <span class="text-gray-400 text-sm font-medium">FOCUS TIME</span>
+                            </div>
+                            <div id="stat-focus-time" class="text-2xl font-bold text-white">0h 0m</div>
+                        </div>
+                        <div class="bg-custom-card p-4 rounded-xl shadow-lg transition-colors duration-300">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-custom-primary"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                                <span class="text-gray-400 text-sm font-medium">TASKS</span>
+                            </div>
+                            <div id="stat-tasks" class="text-2xl font-bold text-white">0</div>
+                        </div>
+                        <div class="bg-custom-card p-4 rounded-xl shadow-lg transition-colors duration-300">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-custom-primary"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                <span class="text-gray-400 text-sm font-medium">SESSIONS</span>
+                            </div>
+                            <div id="stat-sessions" class="text-2xl font-bold text-white">0</div>
+                        </div>
+                        <div class="bg-custom-card p-4 rounded-xl shadow-lg transition-colors duration-300">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-custom-primary"><path d="M18 8c0-2.21-1.79-4-4-4S10 5.79 10 8v2H8v8h12v-8h-2V8zM14 8V6c0-1.1.9-2 2-2s2 .9 2 2v2"></path><path d="M7 10v8h-2v-8h2z"></path><path d="M5 10c0-2.21-1.79-4-4-4"></path></svg>
+                                <span class="text-gray-400 text-sm font-medium">BREAK TIME</span>
+                            </div>
+                            <div id="stat-break-time" class="text-2xl font-bold text-white">0h 0m</div>
+                        </div>
+                    </div>
+                    
+                    <h3 class="text-xl font-bold text-white pt-4">Recent Productivity</h3>
+                    <div class="bg-custom-card p-4 rounded-xl shadow-lg h-48 flex items-center justify-center transition-colors duration-300">
+                        <span class="text-gray-500">Grafik Produktivitas (Placeholder)</span>
+                    </div>
+                </div>
+
+                <!-- Kolom Tengah: Focus Timer (dari v3) -->
+                <div class="lg:col-span-5 flex flex-col items-center space-y-6">
+                    <!-- Timer Display -->
+                    <div class="relative w-64 h-64 md:w-72 md:h-72 flex items-center justify-center">
+                        <div id="timer-display-bg" class="absolute inset-0 rounded-full bg-custom-card shadow-inner transition-colors duration-300"></div>
+                        <div id="timer-display-inner-bg" class="absolute inset-2 rounded-full bg-custom-bg shadow-lg transition-colors duration-300"></div>
+                        <div class="absolute inset-6 rounded-full border-4 border-custom-primary"
+                             style="box-shadow: 0 0 20px 0px #8a7fff;">
+                        </div>
+                        <div class="relative z-10 text-center">
+                            <div id="timer-display" class="text-6xl md:text-7xl font-bold text-white">25:00</div>
+                            <div id="timer-mode" class="text-lg font-semibold text-custom-primary tracking-widest">FOCUS MODE</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Tombol Kontrol Timer -->
+                    <div class="flex space-x-4 w-full max-w-md">
+                        <button id="btn-pause" class="flex-1 bg-red-600/50 hover:bg-red-600/80 text-white py-3 px-6 rounded-xl font-bold text-lg shadow-lg transition-all duration-200 flex items-center justify-center space-x-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+                            <span>Pause</span>
+                        </button>
+                        <button id="btn-reset" class="flex-1 bg-custom-card-light hover:bg-gray-600 text-gray-300 py-3 px-6 rounded-xl font-bold text-lg shadow-lg transition-all duration-200 flex items-center justify-center space-x-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                            <span>Reset</span>
+                        </button>
+                    </div>
+
+                    <!-- Input Waktu -->
+                    <div class="grid grid-cols-2 gap-4 w-full max-w-md">
+                        <div class="bg-custom-card p-4 rounded-xl transition-colors duration-300">
+                            <label class="text-sm font-medium text-gray-400">Focus (min)</label>
+                            <input id="input-focus" type="number" value="25" class="w-full bg-transparent text-white text-2xl font-bold border-none focus:ring-0 p-0 mt-1">
+                        </div>
+                        <div class="bg-custom-card p-4 rounded-xl transition-colors duration-300">
+                            <label class="text-sm font-medium text-gray-400">Break (min)</label>
+                            <input id="input-break" type="number" value="5" class="w-full bg-transparent text-white text-2xl font-bold border-none focus:ring-0 p-0 mt-1">
+                        </div>
+                    </div>
+                    
+                    <!-- Pilihan Waktu Cepat -->
+                    <div class="w-full max-w-md space-y-3">
+                        <div class="flex justify-between space-x-2">
+                            <button class="timer-preset-focus flex-1 bg-custom-card hover:bg-custom-card-light text-gray-300 py-2 rounded-lg transition-colors duration-300" data-time="25">25m</button>
+                            <button class="timer-preset-focus flex-1 bg-custom-card hover:bg-custom-card-light text-gray-300 py-2 rounded-lg transition-colors duration-300" data-time="45">45m</button>
+                            <button class="timer-preset-focus flex-1 bg-custom-card hover:bg-custom-card-light text-gray-300 py-2 rounded-lg transition-colors duration-300" data-time="60">60m</button>
+                            <button class="timer-preset-focus flex-1 bg-custom-card hover:bg-custom-card-light text-gray-300 py-2 rounded-lg transition-colors duration-300" data-time="90">90m</button>
+                        </div>
+                        <div class="flex justify-between space-x-2">
+                            <button class="timer-preset-break flex-1 bg-custom-card hover:bg-custom-card-light text-gray-300 py-2 rounded-lg transition-colors duration-300" data-time="5">5m</button>
+                            <button class="timer-preset-break flex-1 bg-custom-card hover:bg-custom-card-light text-gray-300 py-2 rounded-lg transition-colors duration-300" data-time="10">10m</button>
+                            <button class="timer-preset-break flex-1 bg-custom-card hover:bg-custom-card-light text-gray-300 py-2 rounded-lg transition-colors duration-300" data-time="15">15m</button>
+                            <button class="timer-preset-break flex-1 bg-custom-card hover:bg-custom-card-light text-gray-300 py-2 rounded-lg transition-colors duration-300" data-time="0">0m</button>
+                        </div>
+                    </div>
+
+                    <!-- Pengaturan Tambahan (Toggle Breaks) -->
+                    <div class="flex items-center justify-center space-x-6 pt-4 w-full max-w-md">
+                        <label for="toggle-breaks" class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="toggle-breaks" class="sr-only peer" checked>
+                            <div class="relative w-48 h-12 rounded-full p-1
+                                        bg-gray-600 peer-checked:bg-green-500 
+                                        peer-checked:border-2 peer-checked:border-white 
+                                        transition-all duration-300 ease-in-out
+                                        flex items-center">
+                                <div class="absolute bg-white w-10 h-10 rounded-full 
+                                            left-1 
+                                            peer-checked:translate-x-[7.75rem] 
+                                            transition-all duration-300 ease-in-out z-10">
+                                </div>
+                                <div class="relative w-full h-full flex items-center">
+                                    <span id="toggle-breaks-text" 
+                                          class="absolute w-auto text-sm font-bold text-white 
+                                                 right-4 peer-checked:left-4
+                                                 transition-all duration-300 ease-in-out">
+                                        <!-- Teks diisi oleh JS -->
+                                    </span>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                    
+                    <div class="text-gray-500 text-sm italic">Stay sharp, take breaks.</div>
+                </div>
+
+                <!-- Kolom Kanan: To-Do List (dari v3) -->
+                <div class="lg:col-span-4 space-y-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-2xl font-bold text-white">Your Todos</h2>
+                        <span id="todo-stats" class="text-sm text-gray-400 bg-custom-card px-3 py-1 rounded-full transition-colors duration-300">0 total</span>
+                    </div>
+
+                    <div id="todo-list-container" class="space-y-3 h-96 overflow-y-auto pr-2">
+                        <!-- To-do item akan ditambahkan di sini oleh JS -->
+                    </div>
+                    
+                    <div class="bg-custom-card p-4 rounded-xl shadow-lg space-y-4 transition-colors duration-300">
+                        <input id="todo-input" type="text" class="w-full bg-custom-card-light text-white placeholder-gray-400 border-none rounded-lg focus:ring-2 focus:ring-custom-primary transition-colors duration-300" placeholder="Add a new todo...">
+                        
+                        <div>
+                            <span class="text-sm font-medium text-gray-400">Color</span>
+                            <div id="color-picker" class="flex space-x-2 mt-2">
+                                <div class="color-dot w-6 h-6 rounded-full cursor-pointer bg-blue-500 ring-2 ring-white" data-color="bg-blue-500"></div>
+                                <div class="color-dot w-6 h-6 rounded-full cursor-pointer bg-red-500" data-color="bg-red-500"></div>
+                                <div class="color-dot w-6 h-6 rounded-full cursor-pointer bg-green-500" data-color="bg-green-500"></div>
+                                <div class="color-dot w-6 h-6 rounded-full cursor-pointer bg-yellow-400" data-color="bg-yellow-400"></div>
+                                <div class="color-dot w-6 h-6 rounded-full cursor-pointer bg-purple-500" data-color="bg-purple-500"></div>
+                                <div class="color-dot w-6 h-6 rounded-full cursor-pointer bg-pink-500" data-color="bg-pink-500"></div>
+                                <div class="color-dot w-6 h-6 rounded-full cursor-pointer bg-indigo-500" data-color="bg-indigo-500"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="todo-priority" class="text-sm font-medium text-gray-400">Priority</label>
+                            <select id="todo-priority" class="w-full bg-custom-card-light text-white border-none rounded-lg mt-2 focus:ring-2 focus:ring-custom-primary transition-colors duration-300">
+                                <option value="Normal" class="bg-custom-card">Normal</option>
+                                <option value="Important" class="bg-custom-card">Important</option>
+                                <option value="Urgent" class="bg-custom-card">Urgent</option>
+                            </select>
+                        </div>
+                        
+                        <button id="add-todo-btn" class="w-full bg-custom-primary text-white font-bold py-3 rounded-xl shadow-lg transition-transform duration-200 hover:scale-[1.03]">
+                            Add Todo
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- =================================================================
+             HALAMAN PENGUMPULAN TUGAS
+             ================================================================== -->
+        <div id="page-tugas" class="hidden">
+            <div class="max-w-4xl mx-auto bg-white dark:bg-custom-card shadow-2xl rounded-2xl overflow-hidden transition-colors duration-300">
+                <!-- Header Formulir -->
+                <div class="p-6 md:p-8 bg-gradient-to-r from-custom-primary to-blue-500">
+                    <h2 class="text-3xl font-extrabold text-white">Formulir Pengumpulan Tugas</h2>
+                    <p class="text-blue-100 mt-2">SMANDEL Student Hub</p>
+                </div>
+                
+                <!-- Konten Formulir -->
+                <form id="form-tugas" class="p-6 md:p-8 space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Nama Guru -->
+                        <div>
+                            <label for="nama-guru" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nama Guru</label>
+                            <select id="nama-guru" name="nama-guru" class="w-full border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-custom-card-light dark:text-white rounded-lg shadow-sm focus:ring-custom-primary focus:border-custom-primary transition-colors duration-300">
+                                <option value="">Pilih Guru</option>
+                                <!-- Diisi oleh JS -->
+                            </select>
+                        </div>
+
+                        <!-- Mata Pelajaran -->
+                        <div>
+                            <label for="mata-pelajaran" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Mata Pelajaran</label>
+                            <select id="mata-pelajaran" name="mata-pelajaran" class="w-full border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-custom-card-light dark:text-white rounded-lg shadow-sm focus:ring-custom-primary focus:border-custom-primary transition-colors duration-300">
+                                <option value="">Pilih Mata Pelajaran</option>
+                                <!-- Diisi oleh JS -->
+                            </select>
+                        </div>
+
+                        <!-- Nama Peserta Didik -->
+                        <div>
+                            <label for="nama-siswa" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nama Peserta Didik</label>
+                            <input type="text" id="nama-siswa" name="nama-siswa" class="w-full border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-custom-card-light dark:text-white rounded-lg shadow-sm focus:ring-custom-primary focus:border-custom-primary transition-colors duration-300" placeholder="Masukkan nama lengkap Anda">
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                             <!-- Nomor Absen -->
+                            <div>
+                                <label for="nomor-absen" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">No. Absen</label>
+                                <select id="nomor-absen" name="nomor-absen" class="w-full border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-custom-card-light dark:text-white rounded-lg shadow-sm focus:ring-custom-primary focus:border-custom-primary transition-colors duration-300">
+                                    <option value="">Pilih</option>
+                                    <!-- Diisi oleh JS -->
+                                </select>
+                            </div>
+                            <!-- Kelas -->
+                            <div>
+                                <label for="kelas" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Kelas</label>
+                                <select id="kelas" name="kelas" class="w-full border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-custom-card-light dark:text-white rounded-lg shadow-sm focus:ring-custom-primary focus:border-custom-primary transition-colors duration-300">
+                                    <option value="">Pilih Kelas</option>
+                                    <!-- Diisi oleh JS -->
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Deskripsi Tugas -->
+                        <div class="md:col-span-2">
+                            <label for="deskripsi-tugas" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Deskripsi Tugas</label>
+                            <textarea id="deskripsi-tugas" name="deskripsi-tugas" rows="4" class="w-full border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-custom-card-light dark:text-white rounded-lg shadow-sm focus:ring-custom-primary focus:border-custom-primary transition-colors duration-300" placeholder="Jelaskan sedikit tentang tugas Anda..."></textarea>
+                        </div>
+                        
+                        <!-- Upload File (dari v5) -->
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Upload File Tugas</label>
+                            <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-lg bg-gray-50 dark:bg-custom-card-light transition-colors duration-300">
+                                <div class="space-y-1 text-center">
+                                    <svg class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                                        <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l-3.172 3.172a4 4 0 000 5.656L28 40" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    </svg>
+                                    <div class="flex text-sm text-gray-600 dark:text-gray-400">
+                                        <label for="file-upload" class="relative cursor-pointer bg-white dark:bg-custom-card-light rounded-md font-medium text-custom-primary hover:text-blue-700 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-custom-primary px-1 transition-colors duration-300">
+                                            <span>Upload file</span>
+                                            <input id="file-upload" name="file-upload" type="file" class="sr-only">
+                                        </label>
+                                        <p class="pl-1">atau tarik dan lepas</p>
+                                    </div>
+                                    <p class="text-xs text-gray-500 dark:text-gray-500">PNG, JPG, PDF, DOCX hingga 10MB</p>
+                                    <p id="file-upload-filename" class="text-sm text-gray-500 dark:text-gray-400 mt-2"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Tombol Submit (dari v5) -->
+                    <div class="pt-5">
+                        <button type="submit" id="submit-tugas-btn" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-lg text-white font-bold bg-gradient-to-r from-custom-primary to-blue-500 hover:from-blue-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-custom-primary transition-all duration-200 transform hover:scale-[1.02]">
+                            Kumpulkan Tugas
+                        </button>
+                    </div>
+
+                    <!-- Area Pesan Status (dari v5) -->
+                    <div id="form-status-message" class="text-center text-sm font-medium mt-4"></div>
+
+                </form>
+            </div>
+        </div>
+
+    </main>
+    
+    <!-- =================================================================
+         MODAL PENGATURAN TEMA (dari v3)
+         ================================================================== -->
+    <div id="settings-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[100] hidden" aria-modal="true" role="dialog">
+        <div class="bg-custom-card w-full max-w-2xl rounded-2xl shadow-xl" id="settings-modal-panel">
+            <!-- Modal Header -->
+            <div class="flex justify-between items-center p-5 border-b border-custom-card-light">
+                <h3 class="text-xl font-bold text-white">Pilih Tema Latar Belakang</h3>
+                <button id="modal-close-btn" class="text-gray-400 hover:text-white" title="Tutup">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            <!-- Modal Body -->
+            <div class="p-6 grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <!-- Tombol Tema -->
+                <div class="theme-btn-wrapper" data-theme="theme-default">
+                    <div class="h-24 w-full rounded-lg theme-default border-2 border-custom-card-light cursor-pointer transition-all duration-200 ring-2 ring-transparent"></div>
+                    <p class="text-center text-gray-300 mt-2">Default</p>
+                </div>
+                <div class="theme-btn-wrapper" data-theme="theme-vibrant">
+                    <div class="h-24 w-full rounded-lg theme-vibrant border-2 border-transparent cursor-pointer transition-all duration-200 ring-2 ring-transparent"></div>
+                    <p class="text-center text-gray-300 mt-2">Vibrant</p>
+                </div>
+                <div class="theme-btn-wrapper" data-theme="theme-sunrise">
+                    <div class="h-24 w-full rounded-lg theme-sunrise border-2 border-transparent cursor-pointer transition-all duration-200 ring-2 ring-transparent"></div>
+                    <p class="text-center text-gray-300 mt-2">Sunrise</p>
+                </div>
+                <div class="theme-btn-wrapper" data-theme="theme-ocean">
+                    <div class="h-24 w-full rounded-lg theme-ocean border-2 border-transparent cursor-pointer transition-all duration-200 ring-2 ring-transparent"></div>
+                    <p class="text-center text-gray-300 mt-2">Ocean</p>
+                </div>
+                 <div class="theme-btn-wrapper" data-theme="theme-candy">
+                    <div class="h-24 w-full rounded-lg theme-candy border-2 border-transparent cursor-pointer transition-all duration-200 ring-2 ring-transparent"></div>
+                    <p class="text-center text-gray-300 mt-2">Candy</p>
+                </div>
+                <div class="theme-btn-wrapper" data-theme="theme-twilight">
+                    <div class="h-24 w-full rounded-lg theme-twilight border-2 border-transparent cursor-pointer transition-all duration-200 ring-2 ring-transparent"></div>
+                    <p class="text-center text-gray-300 mt-2">Twilight</p>
+                </div>
+                <div class="theme-btn-wrapper" data-theme="theme-peach">
+                    <div class="h-24 w-full rounded-lg theme-peach border-2 border-transparent cursor-pointer transition-all duration-200 ring-2 ring-transparent"></div>
+                    <p class="text-center text-gray-300 mt-2">Peach</p>
+                </div>
+                <div class="theme-btn-wrapper" data-theme="theme-lava">
+                    <div class="h-24 w-full rounded-lg theme-lava border-2 border-transparent cursor-pointer transition-all duration-200 ring-2 ring-transparent"></div>
+                    <p class="text-center text-gray-300 mt-2">Lava</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- =================================================================
+         SCRIPT UTAMA APLIKASI
+         ================================================================== -->
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+        // =================================================================
+        // KONSTANTA GLOBAL
+        // =================================================================
+        const pageDashboard = document.getElementById('page-dashboard');
+        const pageTugas = document.getElementById('page-tugas');
+        const navDashboard = document.getElementById('nav-dashboard');
+        const navTugas = document.getElementById('nav-tugas');
+
+        // =================================================================
+        // NAVIGASI HALAMAN
+        // =================================================================
+        function showPage(pageId) {
+            if (pageId === 'dashboard') {
+                pageDashboard.classList.remove('hidden');
+                pageTugas.classList.add('hidden');
+                navDashboard.classList.add('bg-custom-primary');
+                navDashboard.classList.remove('bg-gray-600', 'hover:bg-gray-500');
+                navTugas.classList.add('bg-gray-600', 'hover:bg-gray-500');
+                navTugas.classList.remove('bg-custom-primary');
+            } else if (pageId === 'tugas') {
+                pageDashboard.classList.add('hidden');
+                pageTugas.classList.remove('hidden');
+                navTugas.classList.add('bg-custom-primary');
+                navTugas.classList.remove('bg-gray-600', 'hover:bg-gray-500');
+                navDashboard.classList.add('bg-gray-600', 'hover:bg-gray-500');
+                navDashboard.classList.remove('bg-custom-primary');
+            }
+        }
+        navDashboard.addEventListener('click', () => showPage('dashboard'));
+        navTugas.addEventListener('click', () => showPage('tugas'));
+
+        // =================================================================
+        // LOGIKA MODAL PENGATURAN
+        // =================================================================
+        const settingsBtn = document.getElementById('btn-settings');
+        const settingsModal = document.getElementById('settings-modal');
+        const closeModalBtn = document.getElementById('modal-close-btn');
+
+        settingsBtn.addEventListener('click', () => {
+            settingsModal.classList.remove('hidden');
+            settingsModal.classList.add('flex');
+            setTimeout(() => { settingsModal.classList.add('modal-visible'); }, 10);
+        });
+
+        function closeModal() {
+            settingsModal.classList.remove('modal-visible');
+            setTimeout(() => {
+                settingsModal.classList.remove('flex');
+                settingsModal.classList.add('hidden');
+            }, 300);
+        }
+
+        closeModalBtn.addEventListener('click', closeModal);
+        settingsModal.addEventListener('click', (e) => {
+            if (e.target === settingsModal) { closeModal(); }
+        });
+
+        // Logika Ganti Tema
+        const themeButtons = document.querySelectorAll('.theme-btn-wrapper');
+        const body = document.body;
+        const baseBodyClass = "bg-custom-bg text-gray-200";
+
+        function applyTheme(themeClass) {
+            body.className = `${baseBodyClass} ${themeClass}`;
+            localStorage.setItem('hubTheme', themeClass);
+            
+            themeButtons.forEach(btn => {
+                const innerDiv = btn.querySelector('div');
+                if (btn.dataset.theme === themeClass) {
+                    innerDiv.classList.add('ring-custom-primary');
+                } else {
+                    innerDiv.classList.remove('ring-custom-primary');
+                }
+            });
+        }
+        
+        themeButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                applyTheme(button.dataset.theme);
+            });
+        });
+
+        // Muat tema dari localStorage
+        const savedTheme = localStorage.getItem('hubTheme') || 'theme-default';
+        applyTheme(savedTheme);
+
+
+        // =================================================================
+        // LOGIKA TIMER POMODORO
+        // =================================================================
+        const timerDisplay = document.getElementById('timer-display');
+        const timerMode = document.getElementById('timer-mode');
+        const btnPause = document.getElementById('btn-pause');
+        const btnReset = document.getElementById('btn-reset');
+        const inputFocus = document.getElementById('input-focus');
+        const inputBreak = document.getElementById('input-break');
+        const toggleBreaks = document.getElementById('toggle-breaks');
+        const toggleBreaksText = document.getElementById('toggle-breaks-text');
+        const presetFocusBtns = document.querySelectorAll('.timer-preset-focus');
+        const presetBreakBtns = document.querySelectorAll('.timer-preset-break');
+        
+        // Stats
+        const statFocusTime = document.getElementById('stat-focus-time');
+        const statBreakTime = document.getElementById('stat-break-time');
+        const statSessions = document.getElementById('stat-sessions');
+
+        let isRunning = false;
+        let isFocusMode = true;
+        let timerInterval = null;
+        let totalSeconds = parseInt(inputFocus.value) * 60;
+        let focusTime = parseInt(inputFocus.value) * 60;
+        let breakTime = parseInt(inputBreak.value) * 60;
+        let autoStartBreaks = true;
+        
+        let totalFocusMinutes = 0;
+        let totalBreakMinutes = 0;
+        let totalSessions = 0;
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            document.title = `${timerDisplay.textContent} - ${isFocusMode ? 'Focus' : 'Break'}`;
+        }
+        
+        function updateStats() {
+            statFocusTime.textContent = `${Math.floor(totalFocusMinutes / 60)}h ${totalFocusMinutes % 60}m`;
+            statBreakTime.textContent = `${Math.floor(totalBreakMinutes / 60)}h ${totalBreakMinutes % 60}m`;
+            statSessions.textContent = totalSessions;
+        }
+
+        function startTimer() {
+            if (isRunning) return;
+            isRunning = true;
+            btnPause.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg><span>Pause</span>';
+            btnPause.classList.add('bg-red-600/50', 'hover:bg-red-600/80');
+            btnPause.classList.remove('bg-green-600/50', 'hover:bg-green-600/80');
+
+            timerInterval = setInterval(() => {
+                if (totalSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    isRunning = false;
+                    switchMode();
+                } else {
+                    totalSeconds--;
+                    // Update stats setiap menit
+                    if ((totalSeconds + 1) % 60 === 0) {
+                        if (isFocusMode) totalFocusMinutes++;
+                        else totalBreakMinutes++;
+                        updateStats();
+                    }
+                    updateTimerDisplay();
+                }
+            }, 1000);
+        }
+
+        function pauseTimer() {
+            clearInterval(timerInterval);
+            isRunning = false;
+            btnPause.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg><span>Start</span>';
+            btnPause.classList.remove('bg-red-600/50', 'hover:bg-red-600/80');
+            btnPause.classList.add('bg-green-600/50', 'hover:bg-green-600/80');
+        }
+
+        function resetTimer(switchToFocus = true) {
+            pauseTimer();
+            isFocusMode = switchToFocus;
+            totalSeconds = isFocusMode ? focusTime : breakTime;
+            timerMode.textContent = isFocusMode ? 'FOCUS MODE' : 'BREAK TIME';
+            updateTimerDisplay();
+        }
+
+        function switchMode() {
+            if (isFocusMode) {
+                totalSessions++; // Sesi fokus selesai
+                updateStats();
+            }
+            isFocusMode = !isFocusMode;
+            totalSeconds = isFocusMode ? focusTime : breakTime;
+            timerMode.textContent = isFocusMode ? 'FOCUS MODE' : 'BREAK TIME';
+            
+            if (autoStartBreaks || isFocusMode) {
+                startTimer();
+            } else {
+                pauseTimer();
+                updateTimerDisplay();
+            }
+        }
+
+        btnPause.addEventListener('click', () => { isRunning ? pauseTimer() : startTimer(); });
+        btnReset.addEventListener('click', () => resetTimer(true));
+
+        inputFocus.addEventListener('change', () => {
+            focusTime = (parseInt(inputFocus.value) || 25) * 60;
+            if (isFocusMode && !isRunning) resetTimer(true);
+        });
+        inputBreak.addEventListener('change', () => {
+            breakTime = (parseInt(inputBreak.value) || 5) * 60;
+            if (!isFocusMode && !isRunning) resetTimer(false);
+        });
+
+        presetFocusBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                inputFocus.value = btn.dataset.time;
+                focusTime = (parseInt(btn.dataset.time) || 25) * 60;
+                if (isFocusMode && !isRunning) resetTimer(true);
+            });
+        });
+        presetBreakBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                inputBreak.value = btn.dataset.time;
+                breakTime = (parseInt(btn.dataset.time) || 5) * 60;
+                if (!isFocusMode && !isRunning) resetTimer(false);
+            });
+        });
+        
+        toggleBreaks.addEventListener('change', () => {
+            autoStartBreaks = toggleBreaks.checked;
+            toggleBreaksText.textContent = autoStartBreaks ? "AUTO START" : "MANUAL";
+        });
+        toggleBreaksText.textContent = autoStartBreaks ? "AUTO START" : "MANUAL";
+        
+        // Inisialisasi awal
+        updateTimerDisplay();
+        updateStats();
+        pauseTimer(); // Mulai dalam keadaan pause
+
+        // =================================================================
+        // LOGIKA TO-DO LIST
+        // =================================================================
+        const todoInput = document.getElementById('todo-input');
+        const addTodoBtn = document.getElementById('add-todo-btn');
+        const todoListContainer = document.getElementById('todo-list-container');
+        const todoPriority = document.getElementById('todo-priority');
+        const colorPicker = document.getElementById('color-picker');
+        const todoStatsEl = document.getElementById('todo-stats');
+        const statTasks = document.getElementById('stat-tasks');
+
+        let selectedColor = 'bg-blue-500'; // Default
+        let todos = [];
+
+        colorPicker.addEventListener('click', (e) => {
+            if (e.target.classList.contains('color-dot')) {
+                // Hapus ring dari semua
+                colorPicker.querySelectorAll('.color-dot').forEach(dot => dot.classList.remove('ring-2', 'ring-white'));
+                // Tambah ring ke yang diklik
+                e.target.classList.add('ring-2', 'ring-white');
+                selectedColor = e.target.dataset.color;
+            }
+        });
+
+        function renderTodos() {
+            todoListContainer.innerHTML = '';
+            let completedCount = 0;
+            
+            if (todos.length === 0) {
+                 todoListContainer.innerHTML = `<p class="text-gray-500 text-center italic">Tidak ada tugas... ayo tambahkan!</p>`;
+            }
+
+            todos.forEach((todo, index) => {
+                const todoEl = document.createElement('div');
+                todoEl.className = `bg-custom-card-light p-4 rounded-xl flex items-center justify-between shadow-lg transition-all duration-300 ${todo.completed ? 'opacity-50' : ''}`;
+                
+                let priorityClass = 'bg-priority-normal'; // Normal
+                if (todo.priority === 'Important') priorityClass = 'bg-priority-important text-black';
+                if (todo.priority === 'Urgent') priorityClass = 'bg-priority-urgent';
+
+                todoEl.innerHTML = `
+                    <div class="flex items-center space-x-3 overflow-hidden">
+                        <input type="checkbox" class="todo-checkbox" data-index="${index}" ${todo.completed ? 'checked' : ''}>
+                        <div class="overflow-hidden">
+                            <p class="text-white font-medium truncate ${todo.completed ? 'line-through' : ''}">${todo.text}</p>
+                            <span class="text-xs font-semibold px-2 py-0.5 rounded-full ${priorityClass}">${todo.priority}</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2 flex-shrink-0">
+                        <div class="w-4 h-4 rounded-full ${todo.color}"></div>
+                        <button class="text-gray-500 hover:text-red-500" data-index="${index}" data-action="delete">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                        </button>
+                    </div>
+                `;
+                todoListContainer.appendChild(todoEl);
+                if (todo.completed) completedCount++;
+            });
+            
+            todoStatsEl.textContent = `${todos.length} total`;
+            statTasks.textContent = `${completedCount}/${todos.length}`;
+        }
+        
+        function addTodo() {
+            const text = todoInput.value.trim();
+            if (text === '') return;
+            
+            const newTodo = {
+                text: text,
+                priority: todoPriority.value,
+                color: selectedColor,
+                completed: false
+            };
+            
+            todos.push(newTodo);
+            todoInput.value = '';
+            renderTodos();
+            saveTodos();
+        }
+
+        addTodoBtn.addEventListener('click', addTodo);
+        todoInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addTodo();
+        });
+        
+        todoListContainer.addEventListener('click', (e) => {
+            const target = e.target.closest('button[data-action="delete"]') || e.target.closest('input[type="checkbox"]');
+            if (!target) return;
+            
+            const index = parseInt(target.dataset.index);
+            
+            if (target.dataset.action === 'delete') {
+                todos.splice(index, 1);
+            } else if (target.type === 'checkbox') {
+                todos[index].completed = target.checked;
+            }
+            
+            renderTodos();
+            saveTodos();
+        });
+
+        function saveTodos() {
+            localStorage.setItem('hubTodos', JSON.stringify(todos));
+        }
+        function loadTodos() {
+            const savedTodos = localStorage.getItem('hubTodos');
+            if (savedTodos) {
+                todos = JSON.parse(savedTodos);
+            }
+            renderTodos();
+        }
+        
+        loadTodos(); // Muat saat halaman dibuka
+
+        // =================================================================
+        // LOGIKA FORMULIR PENGUMPULAN TUGAS (MENGGUNAKAN google.script.run)
+        // =================================================================
+        
+        // --- Konfigurasi Validasi Sisi Klien ---
+        const MAX_FILE_SIZE_MB = 10;
+        const MAX_FILE_SIZE_BYTES_CLIENT = MAX_FILE_SIZE_MB * 1024 * 1024;
+        const ALLOWED_MIME_TYPES_CLIENT = [
+          'image/png',
+          'image/jpeg',
+          'application/pdf',
+          'application/vnd.openxmlformats-officedocument.wordprocessingml.document' // .docx
+        ];
+        const ALLOWED_EXTENSIONS_STRING = ".png, .jpeg, .jpg, .pdf, .docx";
+        
+        const formTugas = document.getElementById('form-tugas');
+        const submitButton = document.getElementById('submit-tugas-btn');
+        const statusMessage = document.getElementById('form-status-message');
+        const fileInput = document.getElementById('file-upload');
+        const fileUploadName = document.getElementById('file-upload-filename');
+
+        // --- Mengisi Dropdown (Contoh Data) ---
+        const guruSelect = document.getElementById('nama-guru');
+        const mapelSelect = document.getElementById('mata-pelajaran');
+        const absenSelect = document.getElementById('nomor-absen');
+        const kelasSelect = document.getElementById('kelas');
+
+        const daftarGuru = [
+                "Muslicha, M.Pd.", "Bibit Purwantini, M.Pd.", "Rumada, S.PAK., M.Pd.", "Henny Bibinur Baniah, M.Pd.",
+                "Saifudin, S.Si., M.Pd.", "Abdul Salim, M.Pd.", "Oktavianus, S.S.", "H. Edy Pramono, S.Pd.",
+                "Dra. Sri Setyowati, M.Pd.", "Nursiti Kamsiati, S.Pd.", "Diki Lesmana, M.Pd.", "Roni Saputro, S.Pd.",
+                "Uswatun Hasanah, S.Pd.", "Ari Sulastri, S.Pd.", "Drs. Eko Rahardjo, M.M.", "Muhammad Fajar, S.Pd.",
+                "Diah Zen, S.Pd.", "Aulia Belfa Muthia, S.Pd.", "Dr. Gatot Handoko, M.Pd.", "Edyana Nugraha, S.Pd.",
+                "Bagus Cipta Asmauli, S.Pd.", "Bambang Triaji A, S.Pd.", "Swisma, S.Pd.", "Hari Wahyono, S.Pd.",
+                "Fronika Munthe, S.Pd.", "Anggraini Pratiwi, S.Pd.", "Ahmad Syauqi, S.Si., M.Pd.", "Wawan Setiawan, S.Si., M.Stat.",
+                "Suci Fitria, S.Pd.", "Drs. H. Yani Bayani, M.Pd.", "Heri Budi Prasetya, S.Pd.", "Teguh Priyanto, S.Pd.",
+                "Joko Untoro, S.Pd.", "Fakhrizal Arsi, S.Pd.", "Hidayatun Nikmah, S.Pd.", "Drs. Mukhlis",
+                "Yustrida Maisa, S.Pd., M.Si.", "Eti Sugiarti, S.Pd.", "Moch Maulana, S.Pd.", "Deasy Purnama Sari, S.Pd.",
+                "H. Salehudin, S.Si., M.Pd.", "Hj. Rina Gustini, M.Pd.", "Dwi Amelia Savitri, M.Pd.", "Jery Anderson Sitorus, S.Pd.",
+                "Rossy Lanasari, S.Pd.", "Evawati, S.Pd.", "Nuh Hudawi, S.Pd.", "Fauziyah Fitriyani, M.Pd.",
+                "Haryono, S.Pd.", "Wangsa Jaya, M.Si.", "Erza Hermawan, S.Pd.", "Ahmad Jati, M.Pd.",
+                "Reza Fajrin Wijaya Kusuma, S.Pd.", "Ika Budianingsih, S.Pd.", "Aisah Merdeka, S.Pd.", "Catur Rahmi Setiawati, S.Pd.",
+                "Dina Apriliyati, S.Pd.", "Muhammad Sutrisno, S.Pd.", "Rocmuljati Ekasari Dawam, S.Pd.", "Sri Rejeki, S.Pd.",
+                "Wurhandayani, S.Pd.", "Khairunissa, S.T.", "Haerudi Yanshah, S.Kom., M.Pd.", "Prasojo, M.M.S.I.",
+                "Evawati, S.Pd.", "Joko Untoro, S.Pd.", "Hidayatun Nikmah, S.Pd.", "Nuh Hudawi, S.Pd.", "Deasy Purnama Sari, S.Pd."
+            ];
+        const daftarMapel = [
+                "Agama Islam", "Agama Kristen", "Bahasa Indonesia", "Bahasa Inggris", "Bahasa Jerman", "Fisika", "Kimia", "Biologi", 
+                "Geografi", "Sosiologi", "Ekonomi", "Sejarah", "PKN", "PKWU", "Olahraga", "Informatika", "Seni Budaya"
+            ];
+        const daftarKelas = ["X-A", "X-B", "X-C", "X-D", "X-E", "X-F", "X-G", "X-H", "X-I", "X-J", "XI-A", "XI-B", "XI-C", "XI-D", "XI-E", "XI-F", "XI-G", "XI-H", "XI-I", "XI-J", "XII-A", "XII-B", "XII-C", "XII-D", "XII-E", "XII-F", "XII-G", "XII-H", "XII-I", "XII-J"];
+
+        daftarGuru.forEach(guru => guruSelect.options.add(new Option(guru, guru)));
+        daftarMapel.forEach(mapel => mapelSelect.options.add(new Option(mapel, mapel)));
+        daftarKelas.forEach(kelas => kelasSelect.options.add(new Option(kelas, kelas)));
+        for (let i = 1; i <= 36; i++) {
+            absenSelect.options.add(new Option(i, i));
+        }
+        
+        // --- Tampilkan Nama File yang Dipilih ---
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                fileUploadName.textContent = file.name;
+                // Validasi langsung saat memilih file
+                validateFile(file);
+            } else {
+                fileUploadName.textContent = '';
+            }
+        });
+        
+        // --- Atribut 'accept' untuk filter file ---
+        fileInput.setAttribute('accept', ALLOWED_EXTENSIONS_STRING);
+
+        // --- Fungsi Validasi File ---
+        function validateFile(file) {
+            if (file.size > MAX_FILE_SIZE_BYTES_CLIENT) {
+                showStatus(`Error: Ukuran file terlalu besar (${(file.size / 1024 / 1024).toFixed(1)} MB). Maksimal ${MAX_FILE_SIZE_MB} MB.`, "error");
+                return false;
+            }
+            if (!ALLOWED_MIME_TYPES_CLIENT.includes(file.type)) {
+                showStatus(`Error: Tipe file tidak valid. Hanya ${ALLOWED_EXTENSIONS_STRING}.`, "error");
+                return false;
+            }
+            showStatus("", ""); // Hapus pesan error jika valid
+            return true;
+        }
+
+        // --- Event Listener Submit Formulir ---
+        formTugas.addEventListener('submit', (e) => {
+            e.preventDefault(); // Mencegah submit HTML standar
+            
+            // 1. Ambil file
+            if (fileInput.files.length === 0) {
+                showStatus("Error: Anda harus memilih file untuk diunggah.", "error");
+                return;
+            }
+            const file = fileInput.files[0];
+
+            // 2. Validasi Sisi Klien (lagi, untuk pasti)
+            if (!validateFile(file)) return;
+            
+            // 3. Ambil data formulir lainnya
+            const formData = {
+                guru: document.getElementById('nama-guru').value,
+                mapel: document.getElementById('mata-pelajaran').value,
+                nama: document.getElementById('nama-siswa').value,
+                absen: document.getElementById('nomor-absen').value,
+                kelas: document.getElementById('kelas').value,
+                deskripsi: document.getElementById('deskripsi-tugas').value,
+                filename: file.name,
+                mimeType: file.type
+            };
+
+            // 4. Cek validasi form (pastikan tidak ada yang kosong)
+            if (!formData.guru || !formData.mapel || !formData.nama || !formData.absen || !formData.kelas) {
+                showStatus("Error: Harap isi semua kolom wajib (Guru, Mapel, Nama, Absen, Kelas).", "error");
+                return;
+            }
+
+            // 5. Tampilkan status loading
+            showStatus("Sedang mengunggah file... mohon tunggu.", "loading");
+            
+            // 6. Baca file sebagai Base64
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            
+            reader.onload = (event) => {
+                const fileData = event.target.result.split(',')[1]; // Ambil hanya data Base64
+                
+                // 7. Gabungkan data file dengan data formulir
+                const dataToSubmit = {
+                    ...formData,
+                    fileData: fileData
+                };
+                
+                // 8. Kirim data ke Google Apps Script menggunakan google.script.run
+                google.script.run
+                    .withSuccessHandler(onUploadSuccess)
+                    .withFailureHandler(onUploadFailure)
+                    .doPost({ postData: { contents: JSON.stringify(dataToSubmit) } });
+            };
+            
+            reader.onerror = (error) => {
+                showStatus("Error: Gagal membaca file. " + error.message, "error");
+            };
+        });
+
+        // --- Fungsi Callback untuk google.script.run ---
+        function onUploadSuccess(response) {
+            // response adalah hasil parse JSON dari ContentService di code.gs
+            if (response.status === "success") {
+                showStatus(`Tugas Berhasil Di Kumpulkan. <a href="${response.fileUrl}" target="_blank" class="underline font-bold text-blue-300">Lihat file</a>`, "success");
+                formTugas.reset(); 
+                fileUploadName.textContent = '';
+            } else {
+                // Ini menangani error yang "ditangkap" oleh server (misal, validasi gagal)
+                onUploadFailure({ message: response.message });
+            }
+        }
+
+        function onUploadFailure(error) {
+            // error.message akan berisi pesan dari 'throw new Error' di code.gs
+            showStatus(`Gagal mengunggah: ${error.message}`, "error");
+        }
+
+        // --- Fungsi Helper untuk Status UI ---
+        function showStatus(message, type) {
+            statusMessage.innerHTML = message; // Menggunakan innerHTML agar link bisa diklik
+            
+            statusMessage.classList.remove('text-red-500', 'text-green-500', 'text-gray-400');
+            submitButton.disabled = false;
+            submitButton.textContent = 'Kumpulkan Tugas';
+
+            if (type === "success") {
+                statusMessage.classList.add('text-green-500');
+            } else if (type === "error") {
+                statusMessage.classList.add('text-red-500');
+            } else if (type === "loading") {
+                statusMessage.classList.add('text-gray-400');
+                submitButton.disabled = true;
+                submitButton.textContent = 'Memproses...';
+            }
+        }
+        
+        // =================================================================
+        // INISIALISASI HALAMAN
+        // =================================================================
+        showPage('dashboard'); // Tampilkan dashboard saat pertama kali memuat
+
+    });
+    </script>
+</body>
+</html>
